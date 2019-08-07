@@ -16,9 +16,6 @@
 
 package com.elytradev.teckle.common.tile;
 
-import com.elytradev.probe.api.IProbeData;
-import com.elytradev.probe.api.IProbeDataProvider;
-import com.elytradev.probe.api.impl.ProbeData;
 import com.elytradev.teckle.api.IWorldNetwork;
 import com.elytradev.teckle.api.capabilities.CapabilityWorldNetworkTile;
 import com.elytradev.teckle.api.capabilities.IWorldNetworkAssistant;
@@ -352,10 +349,6 @@ public class TileBreaker extends TileNetworkMember implements ITickable {
 
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == TeckleMod.PROBE_CAPABILITY) {
-            if (probeCapability == null) probeCapability = new TileBreaker.ProbeCapability();
-            return (T) probeCapability;
-        }
         if (capability == CapabilityWorldNetworkTile.NETWORK_TILE_CAPABILITY)
             return (T) getNetworkTile();
         return super.getCapability(capability, facing);
@@ -378,25 +371,4 @@ public class TileBreaker extends TileNetworkMember implements ITickable {
         this.networkTile = networkTile;
     }
 
-    private final class ProbeCapability implements IProbeDataProvider {
-        @Override
-        public void provideProbeData(List<IProbeData> data) {
-            if (getNetworkTile().getNode() == null)
-                return;
-
-            if (TeckleMod.INDEV)
-                data.add(new ProbeData(new TextComponentTranslation("tooltip.teckle.node.network",
-                        "All",
-                        getNetworkTile().getNode().getNetwork().getNetworkID().toString().toUpperCase().replaceAll("-", ""),
-                        getNetworkTile().getNode().getNetwork().getNodes().size())));
-
-            List<ItemStack> stacks = new ArrayList<>();
-            for (int i = 0; i < bufferData.getHandler().getSlots(); i++) {
-                stacks.add(bufferData.getHandler().getStackInSlot(i));
-            }
-
-            ProbeData probeData = new ProbeData(new TextComponentTranslation("tooltip.teckle.filter.buffer")).withInventory(ImmutableList.copyOf(stacks));
-            data.add(probeData);
-        }
-    }
 }

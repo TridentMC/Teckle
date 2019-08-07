@@ -16,9 +16,6 @@
 
 package com.elytradev.teckle.common.tile;
 
-import com.elytradev.probe.api.IProbeData;
-import com.elytradev.probe.api.IProbeDataProvider;
-import com.elytradev.probe.api.impl.ProbeData;
 import com.elytradev.teckle.api.IWorldNetwork;
 import com.elytradev.teckle.api.capabilities.CapabilityWorldNetworkTile;
 import com.elytradev.teckle.api.capabilities.IWorldNetworkAssistant;
@@ -35,7 +32,6 @@ import com.elytradev.teckle.common.tile.networktiles.NetworkTileTransposer;
 import com.elytradev.teckle.common.worldnetwork.common.WorldNetworkDatabase;
 import com.elytradev.teckle.common.worldnetwork.common.node.NodeContainer;
 import com.elytradev.teckle.common.worldnetwork.common.node.WorldNetworkEntryPoint;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.BlockSourceImpl;
 import net.minecraft.block.state.IBlockState;
@@ -55,7 +51,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -67,7 +62,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -359,10 +353,6 @@ public class TileFilter extends TileTransposer implements ITickable, IElementPro
 
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == TeckleMod.PROBE_CAPABILITY) {
-            if (probeCapability == null) probeCapability = new TileFilter.ProbeCapability();
-            return (T) probeCapability;
-        }
         if (capability == CapabilityWorldNetworkTile.NETWORK_TILE_CAPABILITY)
             return (T) networkTile;
         return super.getCapability(capability, facing);
@@ -403,25 +393,4 @@ public class TileFilter extends TileTransposer implements ITickable, IElementPro
         return world.getBlockState(pos).getValue(BlockFilter.TRIGGERED);
     }
 
-    private final class ProbeCapability implements IProbeDataProvider {
-        @Override
-        public void provideProbeData(List<IProbeData> data) {
-            if (networkTile.getNode() == null)
-                return;
-
-            if (TeckleMod.INDEV)
-                data.add(new ProbeData(new TextComponentTranslation("tooltip.teckle.node.network",
-                        "All",
-                        networkTile.getNode().getNetwork().getNetworkID().toString().toUpperCase().replaceAll("-", ""),
-                        networkTile.getNode().getNetwork().getNodes().size())));
-
-            List<ItemStack> stacks = new ArrayList<>();
-            for (int i = 0; i < bufferData.getHandler().getSlots(); i++) {
-                stacks.add(bufferData.getHandler().getStackInSlot(i));
-            }
-
-            ProbeData probeData = new ProbeData(new TextComponentTranslation("tooltip.teckle.filter.buffer")).withInventory(ImmutableList.copyOf(stacks));
-            data.add(probeData);
-        }
-    }
 }

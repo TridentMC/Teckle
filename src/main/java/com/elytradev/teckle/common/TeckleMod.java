@@ -16,7 +16,6 @@
 
 package com.elytradev.teckle.common;
 
-import com.elytradev.probe.api.IProbeDataProvider;
 import com.elytradev.teckle.api.capabilities.CapabilityWorldNetworkAssistantHolder;
 import com.elytradev.teckle.api.capabilities.CapabilityWorldNetworkTile;
 import com.elytradev.teckle.common.network.TeckleNetworking;
@@ -55,9 +54,6 @@ public class TeckleMod {
     @Instance
     public static TeckleMod INSTANCE;
 
-    @CapabilityInject(IProbeDataProvider.class)
-    public static Capability<?> PROBE_CAPABILITY;
-
     @CapabilityInject(IMultipartTile.class)
     public static Capability<?> MULTIPART_CAPABILITY;
 
@@ -91,7 +87,8 @@ public class TeckleMod {
         OBJECTS.postInit(e);
         PROXY.registerRenderers(e.getModState());
 
-        ForgeChunkManager.setForcedChunkLoadingCallback(this, (tickets, world) -> {});
+        ForgeChunkManager.setForcedChunkLoadingCallback(this, (tickets, world) -> {
+        });
     }
 
     @EventHandler
